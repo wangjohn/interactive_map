@@ -6,6 +6,7 @@ var TIME_INTERVAL = (60*1000*60*24)*5;
 var PLAY_SPEED = 300;
 var MAP_WIDTH = 960;
 var MAP_HEIGHT = 500;
+var MAXIMUM_NODE_AGE = 10;
 
 /*
  * Variable initialization
@@ -76,12 +77,16 @@ var rScale = d3.scale.sqrt()
                .domain([1, 60])
                .range([10, 70]);
 
+function updateMapNodes(mapInstance) {
+  mapInstance.selectAll(".kill-event").remove();
+}
+
 function createMapNodes(mapInstance, events) {
-  mapInstance.selectAll(".ab")
+  mapInstance.selectAll(".kill-event")
     .data(events)
     .enter()
     .append("circle")
-    .attr("class", "ab")
+    .attr("class", "kill-event age-1")
     .attr("cx", lat)
     .attr("cy", lon)
     .attr("r", function(d){
@@ -93,7 +98,7 @@ function createMapNodes(mapInstance, events) {
 }
 
 function enableNodeHover() {
-  d3.selectAll(".ab")
+  d3.selectAll(".kill-event")
     .on("mouseover", function(d) {
       d3.select("#tooltip")
         .style("opacity", 1);
@@ -169,11 +174,8 @@ d3.json("data/interactive_map_data.json", function(err, data){
 
   //gets called on every slide, updates size of circle and text element
   function setSlide(i) {
-    //remove circles that are no longer revelant
-    g.selectAll(".ab").remove()
-
-    //updated all of the circle radius
-    createMapNodes(g, timestampsArray[i].events)
+    updateMapNodes(g);
+    createMapNodes(g, timestampsArray[i].events);
 
     //update position of the slider
     $( "#slider" ).slider( "value", i );
