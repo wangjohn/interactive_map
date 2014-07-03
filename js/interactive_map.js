@@ -1,13 +1,14 @@
 // Constants
 var START_DATE = "1/1/2014";
 var TIME_INTERVAL = (60*1000*60*24)*5;
+var PLAY_SPEED = 300;
 
 // Initialize variables
 var currentSlide = 0;
 var currentTime = "2013-06-08 08:44:01 AM";
 
 var w = 960, h = 500;
-var stations, timestamps;
+var stations, timestampsArray;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -39,8 +40,10 @@ function createTimestampsArray(events, interval) {
   for (var i=0; i<events.length; i++) {
     currentDateTime = new Date(events[i].date).getTime();
 
-    if (currentDateTime < intervalEndDate().getTime()) {
-      currentEventSet.push(events[i]);
+    if (currentDateTime < intervalEndDate.getTime()) {
+      if (events[i].latitude && events[i].longitude) {
+        currentEventSet.push(events[i]);
+      }
     } else {
       timestampArray.push({
         "date": intervalStartDate,
@@ -77,11 +80,12 @@ d3.json("data/us.json", function(err, us) {
 //show the spinner
 $("#spinner").show();
 
-d3.json("data/interactive_map.json", function(err, data){
+d3.json("data/interactive_map_data.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
 
   var timestampsArray = createTimestampsArray(data.events, TIME_INTERVAL);
+  var maximumSlide = timestampsArray.length - 1;
 
   function lat (d) { return projection([d.longitude, d.latitude])[0]; }
   function lon (d) { return projection([d.longitude, d.latitude])[1]; }
@@ -91,66 +95,59 @@ d3.json("data/interactive_map.json", function(err, data){
 
   //apending a circle for each station, initial radius set to the radius at first time in timestamps array
   g.selectAll(".ab")
-    .data(stations)
+    .data(timestampsArray[0].events)
     .enter()
     .append("circle")
     .attr("class", "ab")
     .attr("cx", lat)
     .attr("cy", lon)
     .attr("r", function(d){
-      if ( d.timeline[0] > 0) { return rScale(d.timeline[0]); }
+      if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
       else {return 0;}
     })
     .style("opacity", ".35")
     .style("fill", "#306a76");
 
-  g.selectAll(".station")
-    .data(stations)
-    .enter()
-    .append("circle")
-    .attr("class", "station")
-    .attr("cx", lat)
-    .attr("cy", lon)
-    .attr("r", 1.25)
-    .attr("opacity", ".7")
-    .style("fill", "#2c344a"); //navy
-
   //initialize jquery slider, and call move function on slide, pass value to move()
   $( "#slider" ).slider({
     value: 0,
     min: 0,
-    max: 2882,
+    max: maximumSlide,
     step: 1,
     slide: function( event, ui ){
       setSlide(ui.value);
     }
   });
 
-
   //gets called on every slide, updates size of circle and text element
   function setSlide(i) {
+    //remove circles that are no longer revelant
+    g.selectAll(".ab").remove()
+
     //updated all of the circle radius
     g.selectAll(".ab")
-      .data(stations)
+      .data(timestampsArray[i].events)
+      .enter()
+      .append("circle")
+      .attr("class", "ab")
+      .attr("cx", lat)
+      .attr("cy", lon)
       .attr("r", function(d){
-        if ( d.timeline[currentSlide] > 0) { return rScale(d.timeline[currentSlide]); }
+        if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
         else {return 0;}
-    });
+      });
+
     //update position of the slider
     $( "#slider" ).slider( "value", i );
     currentSlide = i;
 
-    currentTime = timestamps[i];
+    currentTime = timestampsArray[i].date;
 
-    //parsed time
-    var pt = Date.fromString(currentTime);
-    
     //pass parsed time to moment to return correct format
-    var time = moment(pt).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
+    var time = moment(currentTime).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
 
     //get date in correct format to update day
-    var dt = moment(pt).format("YYYY-MM-DD");
- 
+    var dt = moment(currentTime).format("YYYY-MM-DD");
     update_day(dt);
 
     //updates current time
@@ -165,7 +162,6 @@ d3.json("data/interactive_map.json", function(err, data){
 
   var playInterval;
   var autoRewind = true;
-  var playSpeed = 100;
 
   // Thank you to the guy who created this - http://jsfiddle.net/amcharts/ZPqhP/
   $('#play').click(
@@ -179,7 +175,7 @@ d3.json("data/interactive_map.json", function(err, data){
       $(this).html("pause");
       playInterval = setInterval(function(){
         currentSlide++;
-        if (currentSlide > 2882){
+        if (currentSlide > maximumSlide){
           if (autoRewind){
             currentSlide = 0;
           }
@@ -189,7 +185,7 @@ d3.json("data/interactive_map.json", function(err, data){
           }
         }
         setSlide(currentSlide);
-      }, playSpeed);
+      }, PLAY_SPEED);
   });
 
   //hover state for each station
