@@ -16,6 +16,18 @@
       fill: none;
       stroke: #7A7A7A;
     }
+
+    #tooltip {
+      position: absolute;
+      height: auto;
+      padding: 10px;
+      background-color: white;
+      -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
@@ -29,12 +41,14 @@
         <button id="play">play</button>
         <div id="slider"></div>
       </div>
-      <!-- <p class="kicker" id="showValue"></p> -->
-      <!-- <p><span class="posjul4" onclick="setValue(2498)">go to july 4</span></p> -->
-      
       <div class="date-wrap">
         <div id="current_time">Saturday, June 8th, 8:44 <span>am</span></div>
       </div>
+    </div>
+
+    <div id="tooltip">
+      <p id="name">Broadway-Lafayette</p>
+      <p class="bike"><span id="a-bikes">65</span> bikes available</p>
     </div>
 
   </div>
