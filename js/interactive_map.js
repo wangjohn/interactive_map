@@ -9,9 +9,11 @@ var svg = d3.select("#graphic")
             .attr("width", w)
             .attr("height", h);
 
-var projection = d3.geo.albersUsa()
+var projection = d3.geo.conicConformal()
+                       .rotate([98.35, 0])
+                       .center([0, 39.5])
                        .translate([w/2, h/2])
-                       .scale([1000]);
+                       .scale([1200]);
 
 var path = d3.geo.path()
                  .projection(projection);
