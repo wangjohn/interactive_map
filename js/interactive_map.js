@@ -2,7 +2,7 @@ var currentSlide = 0;
 var currentTime = "2013-06-08 08:44:01 AM";
 
 var w = 960, h = 500;
-var stations, availableBikes, timestamps, the_goods;
+var stations, availableBikes, timestamps;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -46,7 +46,6 @@ d3.json("data/citibike-new.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
 
-  the_goods = data;
   stations = data.stations;
   timestamps = data.timestamps;
 
@@ -71,16 +70,16 @@ d3.json("data/citibike-new.json", function(err, data){
     .style("opacity", ".35")
     .style("fill", "#306a76");
 
-    g.selectAll(".station")
-      .data(stations)
-      .enter()
-      .append("circle")
-      .attr("class", "station")
-      .attr("cx", lat)
-      .attr("cy", lon)
-      .attr("r", 1.25)
-      .attr("opacity", ".7")
-      .style("fill", "#2c344a"); //navy
+  g.selectAll(".station")
+    .data(stations)
+    .enter()
+    .append("circle")
+    .attr("class", "station")
+    .attr("cx", lat)
+    .attr("cy", lon)
+    .attr("r", 1.25)
+    .attr("opacity", ".7")
+    .style("fill", "#2c344a"); //navy
 
   //initialize jquery slider, and call move function on slide, pass value to move()
   $( "#slider" ).slider({
@@ -96,14 +95,14 @@ d3.json("data/citibike-new.json", function(err, data){
 
   //gets called on every slide, updates size of circle and text element
   function setSlide(i) {
-    //updated all of the circles radiussss
+    //updated all of the circle radius
     g.selectAll(".ab")
       .data(stations)
       .attr("r", function(d){
         if ( d.timeline[currentSlide] > 0) { return rScale(d.timeline[currentSlide]); }
         else {return 0;}
     });
-    //update position of the slider  
+    //update position of the slider
     $( "#slider" ).slider( "value", i );
     currentSlide = i;
 
