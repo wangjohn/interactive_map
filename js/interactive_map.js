@@ -20,18 +20,6 @@ var path = d3.geo.path()
 
 var g = svg.append("g");
 
-function addCommas(nStr){
-  nStr += '';
-  x = nStr.split('.');
-  x1 = x[0];
-  x2 = x.length > 1 ? '.' + x[1] : '';
-  var rgx = /(\d+)(\d{3})/;
-  while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-  }
-  return x1 + x2;
-}
-
 //to set the value from clicks
 function setValue(theValue) {
   $('#slider').slider('value', theValue);
@@ -132,10 +120,6 @@ d3.json("data/citibike-new.json", function(err, data){
  
     update_day(dt);
 
-    //get hour to check if it's dark or light
-    var h = moment(pt).format("HH");
-    change_bg(h);
-
     //updates current time
     d3.select("#current_time")
       .html(time);
@@ -144,90 +128,11 @@ d3.json("data/citibike-new.json", function(err, data){
       // TODO: perform date update
     }
 
-    function change_bg(h){
-      //checking to see if the hour is before 5am or after 7pm
-      if (h < 5 || h > 19)
-        { //if yes, change bg to dark (IT'S NIGHT TIME)
-          d3.select("body")
-            .transition()
-            .duration(250)
-            .style("background-color", "#3c3c3c");
-          d3.selectAll("h1")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.selectAll(".description")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.select("#wrap")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.selectAll(".description a")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-        }
-      else if (h == 5 || h == 19)
-        { //if no, change bg to white (IT'S DAWN OR DUSK TIME)
-          d3.select("body")
-            .transition()
-            .duration(250)
-            .style("background-color", "#666666");
-          d3.selectAll("h1")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.selectAll(".description")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.select("#wrap")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-          d3.selectAll(".description a")
-            .transition()
-            .duration(250)
-            .style("color", "white");
-        }
-      else
-        { //if no, change bg to white (IT'S DAY TIME)
-          d3.select("body")
-            .transition()
-            .duration(250)
-            .style("background-color", "white");
-          d3.selectAll("h1")
-            .transition()
-            .duration(250)
-            .style("color", "black");
-          d3.selectAll(".description")
-            .transition()
-            .duration(250)
-            .style("color", "black");
-          d3.select("#wrap")
-            .transition()
-            .duration(250)
-            .style("color", "black");
-          d3.selectAll(".description a")
-            .transition()
-            .duration(250)
-            .style("color", "black");
-        }
-    }
-
-
   } //END OF UPDATE FUNCTION
 
   var playInterval;
   var autoRewind = true;
-
-  function getSpeed(){
-    var speed = $("input:radio[name=speed]:checked").val();
-    if (speed == "fast"){ return 100; }
-    else if (speed == "slow") { return 250; }
-  }
+  var playSpeed = 100;
 
   // Thank you to the guy who created this - http://jsfiddle.net/amcharts/ZPqhP/
   $('#play').click(
@@ -251,7 +156,7 @@ d3.json("data/citibike-new.json", function(err, data){
           }
         }
         setSlide(currentSlide);
-      }, getSpeed() );
+      }, playSpeed);
   });
 
   //hover state for each station
