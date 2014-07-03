@@ -91,7 +91,7 @@ d3.json("data/interactive_map_data.json", function(err, data){
   function lon (d) { return projection([d.longitude, d.latitude])[1]; }
   var rScale = d3.scale.sqrt()
                  .domain([1, 60])
-                 .range([2, 34]);
+                 .range([10, 70]);
 
   //apending a circle for each station, initial radius set to the radius at first time in timestamps array
   g.selectAll(".ab")
@@ -158,6 +158,32 @@ d3.json("data/interactive_map_data.json", function(err, data){
       // TODO: perform date update
     }
 
+    //hover state for each station
+    d3.selectAll(".ab")
+      .on("mouseover", function(d) {
+        d3.select("#tooltip")
+          .style("opacity", 1);
+        d3.select(this)
+          .style("opacity", ".9")
+          .style("stroke", "white")
+          .style("stroke-width", "2");
+        d3.select("#tooltip")
+          .style("left", (d3.event.pageX) + 20 + "px")
+          .style("top", (d3.event.pageY) - 30 + "px");
+        d3.select('#venue-name')
+          .text(d.venue);
+        d3.select('#weapon-names')
+          .text(d.weaponTypes);
+      })
+      .on("mouseout", function() {
+        //Hide the tooltip
+        d3.select("#tooltip")
+          .style("opacity", 0);
+        d3.select(this)
+          .style("opacity", ".35")
+          .style("stroke-width", "0");
+    });
+
   } //END OF UPDATE FUNCTION
 
   var playInterval;
@@ -187,31 +213,4 @@ d3.json("data/interactive_map_data.json", function(err, data){
         setSlide(currentSlide);
       }, PLAY_SPEED);
   });
-
-  //hover state for each station
-  d3.selectAll(".ab")
-    .on("mouseover", function(d) {
-          d3.select("#tooltip")
-            .style("opacity", 1);
-          d3.select(this)
-            .style("opacity", ".9")
-            .style("stroke", "white")
-            .style("stroke-width", "2");
-          d3.select("#tooltip")
-            .style("left", (d3.event.pageX) + 20 + "px")
-            .style("top", (d3.event.pageY) - 30 + "px");
-          d3.select('#name')
-            .text(d.stationName);
-          d3.select('#a-bikes')
-            .text(d.timeline[currentSlide]);
-    })
-    .on("mouseout", function() {
-      //Hide the tooltip
-      d3.select("#tooltip")
-        .style("opacity", 0);
-      d3.select(this)
-        .style("opacity", ".35")
-        .style("stroke-width", "0");
-  });
-
 }); /*END OF D3.JSON function*/
