@@ -1,7 +1,7 @@
 var currentSlide = 0;
 var currentTime = "2013-06-08 08:44:01 AM";
 
-var w = 1960, h = 800;
+var w = 960, h = 500;
 var stations, availableBikes, timestamps, the_goods;
 
 var svg = d3.select("#graphic")
@@ -9,10 +9,9 @@ var svg = d3.select("#graphic")
             .attr("width", w)
             .attr("height", h);
 
-var projection = d3.geo.mercator()
-                       .center([-71.94, 45.726])
+var projection = d3.geo.albersUsa()
                        .translate([w/2, h/2])
-                       .scale([340000]);
+                       .scale([1000]);
 
 var path = d3.geo.path()
                  .projection(projection);
@@ -37,20 +36,23 @@ function setValue(theValue) {
   $('#showValue').html(theValue);
 }
 
-g.selectAll("path.borough_map")
-   .data(topojson.object(nyc_boroughs[0], nyc_boroughs[0].objects.new_york_city_boroughs).geometries)
-   .enter()
-   .append("path")
-   .attr("d", path)
-   .attr("class", "borough_map")
-   .transition()
-   .duration(500)
-   .style("opacity", "1");
+//Draw the map of the United States
+d3.json("data/us.json", function(err, us) {
+  g.insert("path", ".graticule")
+    .datum(topojson.feature(us, us.objects.land))
+    .attr("class", "land")
+    .attr("d", path);
+
+  g.insert("path", ".graticule")
+    .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+    .attr("class", "state-boundary")
+    .attr("d", path);
+});
 
 //show the spinner
 $("#spinner").show();
 
-d3.json("citi-bike/data/citibike-new.json", function(error, data){
+d3.json("data/citibike-new.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
 

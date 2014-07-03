@@ -8,6 +8,22 @@
   <link rel="stylesheet" href="citi-bike/css/fonts.css" />
   <link rel="stylesheet" href="citi-bike/css/slider.css" />
   <link rel="stylesheet" href="citi-bike/css/styles.css" />
+  <style>
+    .land {
+      fill: #222;
+    }
+
+    .county-boundary {
+      fill: none;
+      stroke: #fff;
+      stroke-width: .5px;
+    }
+
+    .state-boundary {
+      fill: none;
+      stroke: #fff;
+    }
+  </style>
 </head>
 <body>
   <div id="container">
@@ -64,7 +80,7 @@
   </div>
 
   <script src="/js/d3.v3.min.js"></script>
-  <script src="/js/topojson.v0.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script src="/js/jquery-1.10.2.min.js"></script>
   <script src="/js/jquery-ui-1.10.3.custom.min.js"></script>
   <script src="/js/boroughs.js"></script>
