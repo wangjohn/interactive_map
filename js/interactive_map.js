@@ -181,7 +181,6 @@ d3.json("data/citibike-new.json", function(err, data){
       d3.select("#tooltip")
         .style("opacity", 0);
       d3.select(this)
-        // .transition()
         .style("opacity", ".35")
         .style("stroke-width", "0");
   });
