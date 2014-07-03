@@ -1,21 +1,8 @@
-var path = d3.geo.path();
 var currentSlide = 0;
-var ct = "2013-06-08 08:44:01 AM";
+var currentTime = "2013-06-08 08:44:01 AM";
 
 var w = 1960, h = 800;
-var stations, availableBikes, timestamps, the_goods, neighborhoods =
-[
-  {"name": "Brooklyn Heights","lat":40.697803,"lon":-73.993052},
-  {"name": "Downtown Brooklyn","lat": 40.684381,"lon": -73.977452},
-  {"name": "Williamsburg","lat": 40.715582,"lon": -73.96035},
-  {"name": "East Village","lat": 40.728137,"lon": -73.98228},
-  {"name": "West Village","lat": 40.736218,"lon": -74.001528},
-  {"name": "Flatiron District","lat": 40.740315,"lon": -73.989533},
-  {"name": "Financial District","lat": 40.706907,"lon": -74.011138},
-  {"name": "Midtown East","lat": 40.752556,"lon": -73.977774},
-  {"name": "Hell's Kitchen","lat": 40.758814,"lon": -73.992623},
-  {"name": "Central Park","lat": 40.769817,"lon": -73.974727}
-];
+var stations, availableBikes, timestamps, the_goods;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -23,7 +10,7 @@ var svg = d3.select("#graphic")
             .attr("height", h);
 
 var projection = d3.geo.mercator()
-                       .center([-73.94, 40.726])
+                       .center([-71.94, 45.726])
                        .translate([w/2, h/2])
                        .scale([340000]);
 
@@ -128,10 +115,10 @@ d3.json("citi-bike/data/citibike-new.json", function(error, data){
     $( "#slider" ).slider( "value", i );
     currentSlide = i;
 
-    ct = timestamps[i];
+    currentTime = timestamps[i];
 
     //parsed time
-    var pt = Date.fromString(ct);
+    var pt = Date.fromString(currentTime);
     
     //pass parsed time to moment to return correct format
     var time = moment(pt).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
@@ -150,16 +137,7 @@ d3.json("citi-bike/data/citibike-new.json", function(error, data){
       .html(time);
 
     function update_day(dt){
-      d3.select("#weather")
-        .text( days[dt].weather );
-      d3.select("#trips")
-        .text( addCommas(days[dt].trips) );
-      d3.select("#hi")
-        .text( days[dt].hi );
-      d3.select("#lo")
-        .text( days[dt].lo );
-      d3.select("#precip")
-        .html( days[dt].precip );
+      // TODO: perform date update
     }
 
     function change_bg(h){
@@ -299,27 +277,4 @@ d3.json("citi-bike/data/citibike-new.json", function(error, data){
         .style("stroke-width", "0");
   });
 
-  //appending neighborhood names/landmarks
-  g.selectAll(".neighborhood")
-    .data(neighborhoods)
-    .enter()
-    .append("text")
-    .attr("x", function(d) { return projection([d.lon, d.lat])[0]; } )
-    .attr("y", function(d) { return projection([d.lon, d.lat])[1]; } )
-    .attr("class", "neighborhood")
-    .text( function(d){return d.name;} );
-
 }); /*END OF D3.JSON function*/
-
-function thankyou(){
-  console.log("Matt, Sasha, Noah, Soma, and my wife. You guys rule.");
-}
-
-// //loading image
-// $("#spinner").show(); //Or whatever you want to do
-// $.getJSON("citi-bike/data/citibike-new.json", function(result) {
-//     //Process your response
-//     $("#spinner").fadeOut();
-// });
-
-
