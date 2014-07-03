@@ -1,43 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>A Month of Citi Bike: A New Yorker Interactive</title>
-<meta description="The New Yorker takes a look at a month in the life of Citi Bike, New York City's new bike sharing program.">
-<meta charset="UTF-8"/>
-
-  <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
+  <title>School Shootings</title>
+  <meta description="An interactive map of school shootings across the United States.">
+  <meta charset="UTF-8"/>
   <link rel="stylesheet" href="citi-bike/css/reset.css" />
   <link rel="stylesheet" href="citi-bike/css/fonts.css" />
   <link rel="stylesheet" href="citi-bike/css/slider.css" />
   <link rel="stylesheet" href="citi-bike/css/styles.css" />
   <script type="text/javascript" src="/js/newyorker_global.js"></script>
-  <script type="text/javascript" async="async">
-  /*Omniture Script*/
-  s_c_il[1].cdw=s_c_il[1].d.write;s_c_il[1].cdwb="";s_c_il[1].d.write=function(m){s_c_il[1].cdwb+=m};
-  CN.stats.omniture.setStatus(CN.site['httpStatusCode']?CN.site['httpStatusCode']:200);
-  CN.stats.omniture.initPlugins();
-
-  if(CN.stats.omniture.thirdParty) {
-  CN.stats.omniture.setThirdParty();
-  }
-
-  if(CN.stats.omniture.trackPage || (document.body.getAttribute('className') != 'listC' || document.body.getAttribute('class') != 'listC')) {
-  if(CN.stats.omniture.doPageTracking2 == undefined) {
-  CN.stats.omniture.doPageTracking();
-  } else {
-  CN.stats.omniture.doPageTracking2();
-  }
-  if(s.pdvalue < 3 && CN.stats.insight) {
-  setTimeout(CN.stats.insight.doTracking, 1000);
-  }
-  }
-  s_c_il[1].d.write=s_c_il[1].cdw;s_c_il[1].crl(0,1);
-</script>
-  <script type="text/javascript" async="async" src="http://www.adobetag.com/d1/condenast/live/MPPFramework.js"></script>
-
 </head>
 <body>
   <div id="spinner">Loading...</div>
@@ -162,15 +133,5 @@
   <script src="/js/moment.min.js"></script>
   <script src="/js/biking-new.js"></script>
 
-  <footer>
-    <div class="wrap">
-      <div class="left">
-        <p style="font-size: 15px;">Return to <a href="http://www.newyorker.com/">newyorker.com</a>.</p>
-        <p class="credit">By Larry Buchanan, Michael Guerriero, and Nick Traverse</p>
-        <p class="credit">Bike locations were calculated using Citi Bike&#8217;s live data on available bikes as reported by the program, and collected every fifteen minutes. Occasional lapses in the program&#8217;s data appear on the map as small gaps in the time sequence. Weather information is from Weather Underground.</p>
-      </div>
-      <div class="clear"></div>
-    </div>
-  </footer>
-  </body>
+</body>
 </html>
