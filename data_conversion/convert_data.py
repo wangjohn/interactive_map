@@ -71,8 +71,8 @@ def convert_to_json(filename, output_filename):
     events = []
     for i in xrange(len(data_matrix)):
         new_event = {
-            "lat": lat_long_data[i][0],
-            "long": lat_long_data[i][1],
+            "latitude": lat_long_data[i][0],
+            "longitude": lat_long_data[i][1],
             "date": data_matrix[i][date_column],
             "venue": data_matrix[i][venue_column],
             "peopleKilled": data_matrix[i][people_killed_column],

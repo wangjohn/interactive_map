@@ -1,8 +1,13 @@
+// Constants
+var START_DATE = "1/1/2014";
+var TIME_INTERVAL = (60*1000*60*24)*5;
+
+// Initialize variables
 var currentSlide = 0;
 var currentTime = "2013-06-08 08:44:01 AM";
 
 var w = 960, h = 500;
-var stations, availableBikes, timestamps;
+var stations, timestamps;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -19,6 +24,36 @@ var path = d3.geo.path()
                  .projection(projection);
 
 var g = svg.append("g");
+
+function createTimestampsArray(events, interval) {
+  events.sort(function(a,b) {
+    return (new Date(a.date) - new Date(b.date));
+  });
+
+  var timestampArray = [];
+  var intervalStartDate = new Date(START_DATE);
+  var intervalEndDate = new Date(intervalStartDate.getTime() + interval);
+
+  var currentDateTime;
+  var currentEventSet = [];
+  for (var i=0; i<events.length; i++) {
+    currentDateTime = new Date(events[i].date).getTime();
+
+    if (currentDateTime < intervalEndDate().getTime()) {
+      currentEventSet.push(events[i]);
+    } else {
+      timestampArray.push({
+        "date": intervalStartDate,
+        "events": currentEventSet,
+      });
+      currentEventSet = [];
+      intervalStartDate = intervalEndDate;
+      intervalEndDate = new Date(intervalStartDate.getTime() + interval);
+    }
+  }
+
+  return timestampArray;
+}
 
 //to set the value from clicks
 function setValue(theValue) {
@@ -42,12 +77,11 @@ d3.json("data/us.json", function(err, us) {
 //show the spinner
 $("#spinner").show();
 
-d3.json("data/citibike-new.json", function(err, data){
+d3.json("data/interactive_map.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
 
-  stations = data.stations;
-  timestamps = data.timestamps;
+  var timestampsArray = createTimestampsArray(data.events, TIME_INTERVAL);
 
   function lat (d) { return projection([d.longitude, d.latitude])[0]; }
   function lon (d) { return projection([d.longitude, d.latitude])[1]; }
