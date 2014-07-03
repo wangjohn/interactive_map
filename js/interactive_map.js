@@ -1,24 +1,27 @@
-// Constants
+/*
+ * Constants
+ */
 var START_DATE = "1/1/2014";
 var TIME_INTERVAL = (60*1000*60*24)*5;
 var PLAY_SPEED = 300;
+var MAP_WIDTH = 960;
+var MAP_HEIGHT = 500;
 
-// Initialize variables
+/*
+ * Variable initialization
+ */
 var currentSlide = 0;
-var currentTime = "2013-06-08 08:44:01 AM";
-
-var w = 960, h = 500;
-var stations, timestampsArray;
+var timestampsArray;
 
 var svg = d3.select("#graphic")
             .append("svg")
-            .attr("width", w)
-            .attr("height", h);
+            .attr("width", MAP_WIDTH)
+            .attr("height", MAP_HEIGHT);
 
 var projection = d3.geo.conicConformal()
                        .rotate([98.35, 0])
                        .center([0, 39.5])
-                       .translate([w/2, h/2])
+                       .translate([MAP_WIDTH/2, MAP_HEIGHT/2])
                        .scale([1200]);
 
 var path = d3.geo.path()
@@ -26,6 +29,9 @@ var path = d3.geo.path()
 
 var g = svg.append("g");
 
+/*
+ * Helper Functions
+ */
 function createTimestampsArray(events, interval) {
   events.sort(function(a,b) {
     return (new Date(a.date) - new Date(b.date));
@@ -58,11 +64,69 @@ function createTimestampsArray(events, interval) {
   return timestampArray;
 }
 
-//to set the value from clicks
+function lat (d) {
+  return projection([d.longitude, d.latitude])[0];
+}
+
+function lon (d) {
+  return projection([d.longitude, d.latitude])[1];
+}
+
+var rScale = d3.scale.sqrt()
+               .domain([1, 60])
+               .range([10, 70]);
+
+function createMapNodes(mapInstance, events) {
+  mapInstance.selectAll(".ab")
+    .data(events)
+    .enter()
+    .append("circle")
+    .attr("class", "ab")
+    .attr("cx", lat)
+    .attr("cy", lon)
+    .attr("r", function(d){
+      if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
+      else {return 0;}
+    })
+    .style("opacity", ".35")
+    .style("fill", "#306a76");
+}
+
+function enableNodeHover() {
+  d3.selectAll(".ab")
+    .on("mouseover", function(d) {
+      d3.select("#tooltip")
+        .style("opacity", 1);
+      d3.select(this)
+        .style("opacity", ".9")
+        .style("stroke", "white")
+        .style("stroke-width", "2");
+      d3.select("#tooltip")
+        .style("left", (d3.event.pageX) + 20 + "px")
+        .style("top", (d3.event.pageY) - 30 + "px");
+      d3.select('#venue-name')
+        .text(d.venue);
+      d3.select('#weapon-names')
+        .text(d.weaponTypes);
+    })
+    .on("mouseout", function() {
+      //Hide the tooltip
+      d3.select("#tooltip")
+        .style("opacity", 0);
+      d3.select(this)
+        .style("opacity", ".35")
+        .style("stroke-width", "0");
+  });
+}
+
 function setValue(theValue) {
   $('#slider').slider('value', theValue);
   $('#showValue').html(theValue);
 }
+
+/*
+ * D3 Rendering
+ */
 
 //Draw the map of the United States
 d3.json("data/us.json", function(err, us) {
@@ -80,6 +144,7 @@ d3.json("data/us.json", function(err, us) {
 //show the spinner
 $("#spinner").show();
 
+//Use the interactive map data and play things
 d3.json("data/interactive_map_data.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
@@ -87,26 +152,9 @@ d3.json("data/interactive_map_data.json", function(err, data){
   var timestampsArray = createTimestampsArray(data.events, TIME_INTERVAL);
   var maximumSlide = timestampsArray.length - 1;
 
-  function lat (d) { return projection([d.longitude, d.latitude])[0]; }
-  function lon (d) { return projection([d.longitude, d.latitude])[1]; }
-  var rScale = d3.scale.sqrt()
-                 .domain([1, 60])
-                 .range([10, 70]);
-
   //apending a circle for each station, initial radius set to the radius at first time in timestamps array
-  g.selectAll(".ab")
-    .data(timestampsArray[0].events)
-    .enter()
-    .append("circle")
-    .attr("class", "ab")
-    .attr("cx", lat)
-    .attr("cy", lon)
-    .attr("r", function(d){
-      if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
-      else {return 0;}
-    })
-    .style("opacity", ".35")
-    .style("fill", "#306a76");
+  createMapNodes(g, timestampsArray[0].events);
+  enableNodeHover();
 
   //initialize jquery slider, and call move function on slide, pass value to move()
   $( "#slider" ).slider({
@@ -125,23 +173,13 @@ d3.json("data/interactive_map_data.json", function(err, data){
     g.selectAll(".ab").remove()
 
     //updated all of the circle radius
-    g.selectAll(".ab")
-      .data(timestampsArray[i].events)
-      .enter()
-      .append("circle")
-      .attr("class", "ab")
-      .attr("cx", lat)
-      .attr("cy", lon)
-      .attr("r", function(d){
-        if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
-        else {return 0;}
-      });
+    createMapNodes(g, timestampsArray[i].events)
 
     //update position of the slider
     $( "#slider" ).slider( "value", i );
     currentSlide = i;
 
-    currentTime = timestampsArray[i].date;
+    var currentTime = timestampsArray[i].date;
 
     //pass parsed time to moment to return correct format
     var time = moment(currentTime).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
@@ -158,31 +196,7 @@ d3.json("data/interactive_map_data.json", function(err, data){
       // TODO: perform date update
     }
 
-    //hover state for each station
-    d3.selectAll(".ab")
-      .on("mouseover", function(d) {
-        d3.select("#tooltip")
-          .style("opacity", 1);
-        d3.select(this)
-          .style("opacity", ".9")
-          .style("stroke", "white")
-          .style("stroke-width", "2");
-        d3.select("#tooltip")
-          .style("left", (d3.event.pageX) + 20 + "px")
-          .style("top", (d3.event.pageY) - 30 + "px");
-        d3.select('#venue-name')
-          .text(d.venue);
-        d3.select('#weapon-names')
-          .text(d.weaponTypes);
-      })
-      .on("mouseout", function() {
-        //Hide the tooltip
-        d3.select("#tooltip")
-          .style("opacity", 0);
-        d3.select(this)
-          .style("opacity", ".35")
-          .style("stroke-width", "0");
-    });
+    enableNodeHover();
 
   } //END OF UPDATE FUNCTION
 
@@ -213,4 +227,4 @@ d3.json("data/interactive_map_data.json", function(err, data){
         setSlide(currentSlide);
       }, PLAY_SPEED);
   });
-}); /*END OF D3.JSON function*/
+});
