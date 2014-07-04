@@ -5,7 +5,6 @@
   <meta description="An interactive map of school shootings across the United States.">
   <meta charset="UTF-8"/>
   <link rel="stylesheet" href="/css/slider.css" />
-  <link rel="stylesheet" href="citi-bike/css/styles.css" />
   <style>
     .land {
       fill: none;
@@ -43,6 +42,39 @@
       </div>
       <div class="date-wrap">
         <div id="current_time">Saturday, June 8th, 8:44 <span>am</span></div>
+      </div>
+      <div class="dropdown-wrap">
+        <div class="venue-dropdown-wrap">
+          <span class="dropdown-label">Venue Type</span>
+          <select class="dropdown" id="venue-dropdown">
+            <option value="all" selected="selected">All venues</option>
+            <option value="1">School (includes university, college, etc.)</option>
+            <option value="2">Office</option>
+            <option value="3">Manufacturing (includes warehouse, factory, etc.)</option>
+            <option value="4">Government building</option>
+            <option value="5">Courthouse (includes jail, etc.)</option>
+            <option value="6">Hotel (includes motel, etc.)</option>
+            <option value="7">Casino</option>
+            <option value="8">Industrial (includes oil rig, mine, chemical plant, nuclear plant, etc.)</option>
+            <option value="9">Transportation (includes airport, metro, train, cruise, etc.)</option>
+            <option value="10">Large venue (includes stadium, raceway, amusement park, etc.)</option>
+            <option value="11">Hospital</option>
+            <option value="12">Military base</option>
+          </select>
+        </div>
+        <div class="weapon-dropdown-wrap">
+          <span class="dropdown-label">Weapon Type</span>
+          <select class="dropdown" id="weapon-dropdown">
+            <option value="all" selected="selected">All weapons</option>
+            <option value="pistol">Pistol</option>
+            <option value="rifle">Rifle</option>
+            <option value="shotgun">Shotgun</option>
+            <option value="unknownGun">Unknown Gun</option>
+            <option value="explosive">Explosive</option>
+            <option value="knife">Knife</option>
+            <option value="nonMetallicObject">Non-metallic object</option>
+          </select>
+        </div>
       </div>
     </div>
 
