@@ -166,7 +166,7 @@ function setValue(theValue) {
  */
 
 //Draw the map of the United States
-d3.json("data/us.json", function(err, us) {
+d3.json("./data/us.json", function(err, us) {
   g.insert("path", ".graticule")
     .datum(topojson.feature(us, us.objects.land))
     .attr("class", "land")
@@ -182,7 +182,7 @@ d3.json("data/us.json", function(err, us) {
 $("#spinner").show();
 
 //Use the interactive map data and play things
-d3.json("data/interactive_map_data.json", function(err, data){
+d3.json("./data/interactive_map_data.json", function(err, data){
   //remove the spinner after load
   $("#spinner").hide();
 
