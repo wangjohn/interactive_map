@@ -7,6 +7,7 @@ var PLAY_SPEED = 300;
 var MAP_WIDTH = 960;
 var MAP_HEIGHT = 500;
 var MAXIMUM_NODE_AGE = 10;
+var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
 
 /*
  * Variable initialization
@@ -81,18 +82,49 @@ function updateMapNodes(mapInstance) {
   mapInstance.selectAll(".kill-event").remove();
 }
 
-function createMapNodes(mapInstance, events) {
+function createAgeDecayedEvent(originalEvent, ageDecay) {
+  var newEvent = {};
+  for (var key in originalEvent) {
+    newEvent[key] = originalEvent[key];
+  }
+  newEvent["ageDecay"] = ageDecay;
+  return newEvent;
+}
+
+function getEventWrappers(timestampsArray, arrayIndex) {
+  var events = [];
+  for (var i=0; i<MAXIMUM_NODE_AGE; i++) {
+    if (arrayIndex - i >= 0) {
+      var originalEvents = timestampsArray[arrayIndex - i].events;
+      for (var j=0; j<originalEvents.length; j++) {
+        events.push(createAgeDecayedEvent(originalEvents[j], i))
+      }
+    }
+  }
+  return events;
+}
+
+function radiusFunction(d) {
+  if (d.peopleKilled > 0) {
+    var nodeAgeMidpoint = (MAXIMUM_NODE_AGE / 2) - 1;
+    var ageDecayAdjustment = ((-1.0 / nodeAgeMidpoint) * Math.abs(d.ageDecay - nodeAgeMidpoint) + 1) * MAXIMUM_EXTRA_NODE_SIZE
+    return rScale(d.peopleKilled) * (1 + ageDecayAdjustment);
+  } else {
+    return 0;
+  }
+}
+
+function createMapNodes(mapInstance, timestampsArray, arrayIndex) {
+  var events = getEventWrappers(timestampsArray, arrayIndex);
+
   mapInstance.selectAll(".kill-event")
     .data(events)
     .enter()
     .append("circle")
-    .attr("class", "kill-event age-1")
+    .attr("class", "kill-event")
     .attr("cx", lat)
     .attr("cy", lon)
-    .attr("r", function(d){
-      if ( d.peopleKilled > 0) { return rScale(d.peopleKilled); }
-      else {return 0;}
-    })
+    .attr("r", radiusFunction)
     .style("opacity", ".35")
     .style("fill", "#306a76");
 }
@@ -158,7 +190,7 @@ d3.json("data/interactive_map_data.json", function(err, data){
   var maximumSlide = timestampsArray.length - 1;
 
   //apending a circle for each station, initial radius set to the radius at first time in timestamps array
-  createMapNodes(g, timestampsArray[0].events);
+  createMapNodes(g, timestampsArray, 0);
   enableNodeHover();
 
   //initialize jquery slider, and call move function on slide, pass value to move()
@@ -175,7 +207,7 @@ d3.json("data/interactive_map_data.json", function(err, data){
   //gets called on every slide, updates size of circle and text element
   function setSlide(i) {
     updateMapNodes(g);
-    createMapNodes(g, timestampsArray[i].events);
+    createMapNodes(g, timestampsArray, i);
 
     //update position of the slider
     $( "#slider" ).slider( "value", i );
