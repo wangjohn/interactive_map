@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>School Shootings</title>
+  <meta description="An interactive map of school shootings across the United States.">
+  <meta charset="UTF-8"/>
+  <script src="/js/d3.v3.min.js"></script>
+  <script src="/js/topojson.v1.min.js"></script>
+  <script src="/js/jquery-1.10.2.min.js"></script>
+  <script src="/js/jquery-ui-1.10.3.custom.min.js"></script>
+  <script src="/js/moment.min.js"></script>
+  <script src="/js/interactive_map.js"></script>
+  <link rel="stylesheet" href="/css/slider.css" />
+  <style>
+    .land {
+      fill: none;
+      stroke: #7A7A7A;
+    }
+
+    .state-boundary {
+      fill: none;
+      stroke: #7A7A7A;
+    }
+
+    #tooltip {
+      position: absolute;
+      height: auto;
+      padding: 10px;
+      background-color: white;
+      -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="graphic">
+    </div>
+    <div id="wrap">
+      <h1>School Shootings Across the United States</h1>
+      <div id="slider-wrap">
+        <span style="margin-right: 10px;">play or drag the slider </span>
+        <button id="play">play</button>
+        <div id="slider"></div>
+      </div>
+      <div class="date-wrap">
+        <div id="current_time">Saturday, June 8th, 8:44 <span>am</span></div>
+      </div>
+      <div class="dropdown-wrap">
+        <div class="venue-dropdown-wrap">
+          <span class="dropdown-label">Venue Type</span>
+          <select class="dropdown" id="venue-dropdown">
+            <option value="all" selected="selected">All venues</option>
+            <option value="1">School (includes university, college, etc.)</option>
+            <option value="2">Office</option>
+            <option value="3">Manufacturing (includes warehouse, factory, etc.)</option>
+            <option value="4">Government building</option>
+            <option value="5">Courthouse (includes jail, etc.)</option>
+            <option value="6">Hotel (includes motel, etc.)</option>
+            <option value="7">Casino</option>
+            <option value="8">Industrial (includes oil rig, mine, chemical plant, nuclear plant, etc.)</option>
+            <option value="9">Transportation (includes airport, metro, train, cruise, etc.)</option>
+            <option value="10">Large venue (includes stadium, raceway, amusement park, etc.)</option>
+            <option value="11">Hospital</option>
+            <option value="12">Military base</option>
+          </select>
+        </div>
+        <div class="weapon-dropdown-wrap">
+          <span class="dropdown-label">Weapon Type</span>
+          <select class="dropdown" id="weapon-dropdown">
+            <option value="all" selected="selected">All weapons</option>
+            <option value="pistol">Pistol</option>
+            <option value="rifle">Rifle</option>
+            <option value="shotgun">Shotgun</option>
+            <option value="unknownGun">Unknown Gun</option>
+            <option value="explosive">Explosive</option>
+            <option value="knife">Knife</option>
+            <option value="nonMetallicObject">Non-metallic object</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="tooltip">
+      <p class="venue">Venue: <span id="venue-name"></span></p>
+      <p class="weapons">Weapons: <span id="weapon-names"></span></p>
+    </div>
+
+  </div>
+</body>
+</html>
