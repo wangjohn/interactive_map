@@ -189,8 +189,21 @@ d3.json("data/interactive_map_data.json", function(err, data){
   var timestampsArray = createTimestampsArray(data.events, TIME_INTERVAL);
   var maximumSlide = timestampsArray.length - 1;
 
-  //apending a circle for each station, initial radius set to the radius at first time in timestamps array
-  createMapNodes(g, timestampsArray, 0);
+  // Initialize all of the data events on the map to begin with.
+  g.selectAll(".kill-event")
+    .data(data.events)
+    .enter()
+    .append("circle")
+    .attr("class", "kill-event")
+    .attr("cx", lat)
+    .attr("cy", lon)
+    .attr("r", function(d) {
+      if (d.peopleKilled > 0) { return rScale(d.peopleKilled) }
+      else { return 0; }
+    })
+    .style("opacity", ".35")
+    .style("fill", "#306a76");
+
   enableNodeHover();
 
   //initialize jquery slider, and call move function on slide, pass value to move()
