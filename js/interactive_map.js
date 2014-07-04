@@ -218,17 +218,9 @@ d3.json("data/interactive_map_data.json", function(err, data){
     //pass parsed time to moment to return correct format
     var time = moment(currentTime).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
 
-    //get date in correct format to update day
-    var dt = moment(currentTime).format("YYYY-MM-DD");
-    update_day(dt);
-
     //updates current time
     d3.select("#current_time")
       .html(time);
-
-    function update_day(dt){
-      // TODO: perform date update
-    }
 
     enableNodeHover();
 
