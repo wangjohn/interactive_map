@@ -19,6 +19,9 @@ var currentSlide = 0;
 var timestampsArray;
 var venueSelected = "all";
 var weaponSelected = "all";
+var playInterval;
+var maximumSlide;
+var autoRewind = true;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -57,6 +60,7 @@ $("#weapon-dropdown").on("change", function() {
 /*
  * Helper Functions
  */
+
 function createTimestampsArray(events, interval) {
   events.sort(function(a,b) {
     return (new Date(a.date) - new Date(b.date));
@@ -159,43 +163,6 @@ function createMapNodes(mapInstance, timestampsArray, arrayIndex) {
     .style("fill", NORMAL_NODE_COLOR);
 }
 
-function enableNodeHover() {
-  d3.selectAll(".kill-event")
-    .on("mouseover", function(d) {
-      d3.select("#tooltip")
-        .style("opacity", 1);
-      d3.select(this)
-        .style("opacity", ".9")
-        .style("stroke", "white")
-        .style("stroke-width", "2");
-      d3.select("#tooltip")
-        .style("left", (d3.event.pageX) + 20 + "px")
-        .style("top", (d3.event.pageY) - 30 + "px");
-      d3.select('#venue-name')
-        .text(d.venue);
-      d3.select('#weapon-names')
-        .text(d.weaponTypes);
-    })
-    .on("mouseout", function() {
-      //Hide the tooltip
-      d3.select("#tooltip")
-        .style("opacity", 0);
-      d3.select(this)
-        .style("opacity", ".35")
-        .style("stroke-width", "0");
-    })
-    .on("click", function(d) {
-      d3.select("#detailed-info-venue-name").text(d.venueName);
-      d3.select("#detailed-info-date").text(d.date);
-      d3.select("#detailed-info-city").text(d.city);
-      d3.select("#detailed-info-state").text(d.state);
-      d3.select("#detailed-info-people-killed").text(d.peopleKilled);
-      d3.select("#detailed-info-people-injured").text(d.peopleInjured);
-      d3.select("#detailed-info-ground-zero").attr("href", d.googleMapsUrl);
-      $("#information-panel").fadeIn(500);
-    });
-}
-
 function changeNodeColors() {
   d3.selectAll(".kill-event")
     .style("fill", function(d) {
@@ -238,7 +205,7 @@ d3.json("./data/interactive_map_data.json", function(err, data){
   $("#spinner").hide();
 
   var timestampsArray = createTimestampsArray(data.events, TIME_INTERVAL);
-  var maximumSlide = timestampsArray.length - 1;
+  maximumSlide = timestampsArray.length - 1;
 
   // Initialize all of the data events on the map to begin with.
   g.selectAll(".kill-event")
@@ -292,31 +259,68 @@ d3.json("./data/interactive_map_data.json", function(err, data){
 
   } //END OF UPDATE FUNCTION
 
-  var playInterval;
-  var autoRewind = true;
-
-  // Thank you to the guy who created this - http://jsfiddle.net/amcharts/ZPqhP/
-  $('#play').click(
-    function(){
-      if (playInterval !== undefined){
+  function toggleNodeProgression() {
+    if (playInterval !== undefined) {
+      clearInterval(playInterval);
+      playInterval = undefined;
+      $("#play").html("play");
+      return;
+    }
+    $("#play").html("pause");
+    playInterval = setInterval(function(){
+      currentSlide++;
+      if (currentSlide > maximumSlide){
+        if (autoRewind){
+          currentSlide = 0;
+        }
+        else {
           clearInterval(playInterval);
-          playInterval = undefined;
-          $(this).html("play");
           return;
         }
-      $(this).html("pause");
-      playInterval = setInterval(function(){
-        currentSlide++;
-        if (currentSlide > maximumSlide){
-          if (autoRewind){
-            currentSlide = 0;
-          }
-          else {
-            clearInterval(playInterval);
-            return;
-          }
+      }
+      setSlide(currentSlide);
+    }, PLAY_SPEED);
+  }
+
+  function enableNodeHover() {
+    d3.selectAll(".kill-event")
+      .on("mouseover", function(d) {
+        d3.select("#tooltip")
+          .style("opacity", 1);
+        d3.select(this)
+          .style("opacity", ".9")
+          .style("stroke", "white")
+          .style("stroke-width", "2");
+        d3.select("#tooltip")
+          .style("left", (d3.event.pageX) + 20 + "px")
+          .style("top", (d3.event.pageY) - 30 + "px");
+        d3.select('#venue-name')
+          .text(d.venue);
+        d3.select('#weapon-names')
+          .text(d.weaponTypes);
+      })
+      .on("mouseout", function() {
+        //Hide the tooltip
+        d3.select("#tooltip")
+          .style("opacity", 0);
+        d3.select(this)
+          .style("opacity", ".35")
+          .style("stroke-width", "0");
+      })
+      .on("click", function(d) {
+        d3.select("#detailed-info-venue-name").text(d.venueName);
+        d3.select("#detailed-info-date").text(d.date);
+        d3.select("#detailed-info-city").text(d.city);
+        d3.select("#detailed-info-state").text(d.state);
+        d3.select("#detailed-info-people-killed").text(d.peopleKilled);
+        d3.select("#detailed-info-people-injured").text(d.peopleInjured);
+        d3.select("#detailed-info-ground-zero").attr("href", d.googleMapsUrl);
+        $("#information-panel").fadeIn(500);
+        if (playInterval !== undefined) {
+          toggleNodeProgression();
         }
-        setSlide(currentSlide);
-      }, PLAY_SPEED);
-  });
+      });
+  }
+
+  $('#play').click(toggleNodeProgression);
 });
