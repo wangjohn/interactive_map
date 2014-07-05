@@ -27,11 +27,63 @@
       pointer-events: none;
       opacity: 0;
     }
+
+    /* Information panel */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    .close:hover, .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+      filter: alpha(opacity=50);
+      opacity: .5;
+    }
+
+    #information-panel {
+      top: 10px;
+      position: absolute;
+      background-color: #d9e0e5;
+      width: 30%;
+      height: 500px;
+    }
+
+    #close-information-panel {
+      top: 2px;
+      position: absolute;
+      right: 2px;
+    }
   </style>
 </head>
 <body>
   <div id="container">
     <div id="graphic">
+    </div>
+    <div id="information-panel" style="display:none;">
+      <div class="information-header">
+        <h1>Information</h1>
+        <button type="button" class="close" data-dismiss="alert" id="close-information-panel">
+          <span aria-hidden="true">×</span>
+          <span class="sr-only">Close</span>
+        </button>
+      </div>
+      <div class="shooting-information">
+        <p class="venue">Venue: <span id="detailed-info-venue-name"></span></p>
+        <p class="date">Date: <span id="detailed-info-date"></span></p>
+        <p class="city">City: <span id="detailed-info-city"></span></p>
+        <p class="state">State: <span id="detailed-info-state"></span></p>
+        <p class="people-killed">People Killed: <span id="detailed-info-people-killed"></span></p>
+        <p class="people-injured">People Injured: <span id="detailed-info-people-injured"></span></p>
+        <p class="ground-zero"><a href="#" id="detailed-info-ground-zero">Ground Zero</a></p>
+      </div>
     </div>
     <div id="wrap">
       <h1>School Shootings Across the United States</h1>

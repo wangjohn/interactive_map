@@ -26,6 +26,10 @@ var projection = d3.geo.conicConformal()
                        .translate([MAP_WIDTH/2, MAP_HEIGHT/2])
                        .scale([1200]);
 
+$("#close-information-panel").on("click", function() {
+  $("#information-panel").fadeOut(500);
+});
+
 var path = d3.geo.path()
                  .projection(projection);
 
@@ -153,7 +157,17 @@ function enableNodeHover() {
       d3.select(this)
         .style("opacity", ".35")
         .style("stroke-width", "0");
-  });
+    })
+    .on("click", function(d) {
+      d3.select("#detailed-info-venue-name").text(d.venueName);
+      d3.select("#detailed-info-date").text(d.date);
+      d3.select("#detailed-info-city").text(d.city);
+      d3.select("#detailed-info-state").text(d.state);
+      d3.select("#detailed-info-people-killed").text(d.peopleKilled);
+      d3.select("#detailed-info-people-injured").text(d.peopleInjured);
+      d3.select("#detailed-info-ground-zero").attr("href", d.googleMapsUrl);
+      $("#information-panel").fadeIn(500);
+    });
 }
 
 function setValue(theValue) {
