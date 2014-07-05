@@ -3,8 +3,12 @@ import re
 import json
 
 DATE_HEADER = "date"
-VENUE_HEADER = "venueType"
+VENUE_TYPE_HEADER = "venueType"
+VENUE_NAME_HEADER = "venueName"
+CITY_HEADER = "city"
+STATE_HEADER = "state"
 PEOPLE_KILLED_HEADER = "peopleKilled"
+PEOPLE_INJURED_HEADER = "peopleInjured"
 URL_HEADER = "googleMapsUrl"
 WEAPON_HEADERS = ["pistol","rifle","shotgun","unknownGun","explosive","knife","nonMetallicObject"]
 
@@ -64,8 +68,12 @@ def convert_to_json(filename, output_filename):
     lat_long_data = convert_to_lat_long(data_matrix, url_column_index)
 
     date_column = get_column_index(headers, DATE_HEADER)
-    venue_column = get_column_index(headers, VENUE_HEADER)
+    venue_type_column = get_column_index(headers, VENUE_TYPE_HEADER)
+    venue_name_column = get_column_index(headers, VENUE_NAME_HEADER)
+    city_column = get_column_index(headers, CITY_HEADER)
+    state_column = get_column_index(headers, STATE_HEADER)
     people_killed_column = get_column_index(headers, PEOPLE_KILLED_HEADER)
+    people_injured_column = get_column_index(headers, PEOPLE_INJURED_HEADER)
     weapon_type_map = create_weapon_type_map(headers, WEAPON_HEADERS)
 
     events = []
@@ -74,8 +82,12 @@ def convert_to_json(filename, output_filename):
             "latitude": lat_long_data[i][0],
             "longitude": lat_long_data[i][1],
             "date": data_matrix[i][date_column],
-            "venue": data_matrix[i][venue_column],
+            "venue": data_matrix[i][venue_type_column],
+            "venueName": data_matrix[i][venue_name_column],
+            "city": data_matrix[i][city_column],
+            "state": data_matrix[i][state_column],
             "peopleKilled": data_matrix[i][people_killed_column],
+            "peopleInjured": data_matrix[i][people_injured_column],
             "weaponTypes": get_weapon_types(data_matrix[i], weapon_type_map)
             }
         events.append(new_event)
@@ -83,7 +95,8 @@ def convert_to_json(filename, output_filename):
     write_to_json_file(events, output_filename)
 
 if __name__ == '__main__':
-    raw_filename = "../data/raw_data.csv"
-    output_filename = "../data/interactive_map_data.json"
+    import os
+    raw_filename = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/raw_data.csv'))
+    output_filename = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/interactive_map_data.json'))
 
     convert_to_json(raw_filename, output_filename)
