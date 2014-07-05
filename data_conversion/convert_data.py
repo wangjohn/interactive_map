@@ -88,6 +88,7 @@ def convert_to_json(filename, output_filename):
             "state": data_matrix[i][state_column],
             "peopleKilled": data_matrix[i][people_killed_column],
             "peopleInjured": data_matrix[i][people_injured_column],
+            "googleMapsUrl": data_matrix[i][url_column_index],
             "weaponTypes": get_weapon_types(data_matrix[i], weapon_type_map)
             }
         events.append(new_event)
