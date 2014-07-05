@@ -14,6 +14,8 @@ var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
  */
 var currentSlide = 0;
 var timestampsArray;
+var venueSelected = "all";
+var weaponSelected = "all";
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -26,14 +28,28 @@ var projection = d3.geo.conicConformal()
                        .translate([MAP_WIDTH/2, MAP_HEIGHT/2])
                        .scale([1200]);
 
-$("#close-information-panel").on("click", function() {
-  $("#information-panel").fadeOut(500);
-});
-
 var path = d3.geo.path()
                  .projection(projection);
 
 var g = svg.append("g");
+
+/*
+ * Initialization for non D3 parts of the display
+ */
+$("#close-information-panel").on("click", function() {
+  $("#information-panel").fadeOut(500);
+});
+
+$("#venue-dropdown").on("change", function() {
+  venueSelected = $("#venue-dropdown").val();
+  changeNodeColors();
+});
+
+$("#weapon-dropdown").on("change", function() {
+  weaponSelected = $("#weapon-dropdown").val();
+  changeNodeColors();
+});
+
 
 /*
  * Helper Functions
@@ -170,6 +186,17 @@ function enableNodeHover() {
     });
 }
 
+function changeNodeColors() {
+  d3.selectAll(".kill-event")
+    .style("fill", function(d) {
+      if ((venueSelected == "all" || d.venue == venueSelected) && (weaponSelected == "all" || d.weaponTypes.indexOf(weaponSelected) > -1)) {
+        return "#DF1B00";
+      } else {
+        return "#306a76";
+      }
+    });
+}
+
 function setValue(theValue) {
   $('#slider').slider('value', theValue);
   $('#showValue').html(theValue);
@@ -219,6 +246,7 @@ d3.json("./data/interactive_map_data.json", function(err, data){
     .style("fill", "#306a76");
 
   enableNodeHover();
+  changeNodeColors();
 
   //initialize jquery slider, and call move function on slide, pass value to move()
   $( "#slider" ).slider({
@@ -250,6 +278,7 @@ d3.json("./data/interactive_map_data.json", function(err, data){
       .html(time);
 
     enableNodeHover();
+    changeNodeColors();
 
   } //END OF UPDATE FUNCTION
 
