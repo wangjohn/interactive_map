@@ -6,7 +6,7 @@ var TIME_INTERVAL = (60*1000*60*24)*5;
 var PLAY_SPEED = 300;
 var MAP_WIDTH = 960;
 var MAP_HEIGHT = 500;
-var MAXIMUM_NODE_AGE = 10;
+var MAXIMUM_NODE_AGE = 20;
 var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
 
 var NORMAL_NODE_COLOR = "#306a76";
@@ -129,8 +129,15 @@ function getEventWrappers(timestampsArray, arrayIndex) {
 
 function radiusFunction(d) {
   if (d.peopleKilled > 0) {
+    var ageDecayAdjustment;
     var nodeAgeMidpoint = (MAXIMUM_NODE_AGE / 2) - 1;
-    var ageDecayAdjustment = ((-1.0 / nodeAgeMidpoint) * Math.abs(d.ageDecay - nodeAgeMidpoint) + 1) * MAXIMUM_EXTRA_NODE_SIZE
+
+    if (d.ageDecay <= nodeAgeMidpoint) {
+      ageDecayAdjustment = ((-1.0 / nodeAgeMidpoint) * Math.abs(d.ageDecay - (nodeAgeMidpoint/2)) + 1) * MAXIMUM_EXTRA_NODE_SIZE;
+    } else {
+      ageDecayAdjustment = Math.max((-1) * ((d.ageDecay / nodeAgeMidpoint) - 1), -1);
+    }
+
     return rScale(d.peopleKilled) * (1 + ageDecayAdjustment);
   } else {
     return 0;
