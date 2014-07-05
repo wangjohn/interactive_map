@@ -2,11 +2,12 @@
  * Constants
  */
 var START_DATE = "1/1/2014";
-var TIME_INTERVAL = (60*1000*60*24)*5;
-var PLAY_SPEED = 300;
+var TIME_INTERVAL = (60*1000*60*24)*3;
+var PLAY_SPEED = 150;
 var MAP_WIDTH = 960;
 var MAP_HEIGHT = 500;
-var MAXIMUM_NODE_AGE = 20;
+var PRIMARY_NODE_AGE = 10;
+var NODE_DECAY_LENGTH = 25;
 var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
 
 var NORMAL_NODE_COLOR = "#306a76";
@@ -72,13 +73,24 @@ function createTimestampsArray(events, interval) {
 
   var currentDateTime;
   var currentEventSet = [];
-  for (var i=0; i<events.length; i++) {
-    currentDateTime = new Date(events[i].date).getTime();
+  var eventCounter = 0;
+  while (eventCounter < events.length) {
+    currentDateTime = new Date(events[eventCounter].date).getTime();
 
-    if (currentDateTime < intervalEndDate.getTime()) {
-      if (events[i].latitude && events[i].longitude) {
-        currentEventSet.push(events[i]);
+    if (currentDateTime < intervalStartDate.getTime()) {
+      while (currentDateTime < intervalStartDate.getTime()) {
+        timestampArray.push({
+          "date": intervalStartDate,
+          "events": []
+        });
+        intervalStartDate = intervalEndDate;
+        intervalEndDate = new Date(intervalStartDate.getTime() + interval);
       }
+    } else if (currentDateTime < intervalEndDate.getTime()) {
+      if (events[eventCounter].latitude && events[eventCounter].longitude) {
+        currentEventSet.push(events[eventCounter]);
+      }
+      eventCounter += 1;
     } else {
       timestampArray.push({
         "date": intervalStartDate,
@@ -88,6 +100,13 @@ function createTimestampsArray(events, interval) {
       intervalStartDate = intervalEndDate;
       intervalEndDate = new Date(intervalStartDate.getTime() + interval);
     }
+  }
+
+  if (currentEventSet.length > 0) {
+    timestampArray.push({
+      "date": intervalStartDate,
+      "events": currentEventSet,
+    });
   }
 
   return timestampArray;
@@ -120,7 +139,7 @@ function createAgeDecayedEvent(originalEvent, ageDecay) {
 
 function getEventWrappers(timestampsArray, arrayIndex) {
   var events = [];
-  for (var i=0; i<MAXIMUM_NODE_AGE; i++) {
+  for (var i=0; i<(PRIMARY_NODE_AGE + NODE_DECAY_LENGTH); i++) {
     if (arrayIndex - i >= 0) {
       var originalEvents = timestampsArray[arrayIndex - i].events;
       for (var j=0; j<originalEvents.length; j++) {
@@ -134,12 +153,12 @@ function getEventWrappers(timestampsArray, arrayIndex) {
 function radiusFunction(d) {
   if (d.peopleKilled > 0) {
     var ageDecayAdjustment;
-    var nodeAgeMidpoint = (MAXIMUM_NODE_AGE / 2) - 1;
 
-    if (d.ageDecay <= nodeAgeMidpoint) {
-      ageDecayAdjustment = ((-1.0 / nodeAgeMidpoint) * Math.abs(d.ageDecay - (nodeAgeMidpoint/2)) + 1) * MAXIMUM_EXTRA_NODE_SIZE;
+    if (d.ageDecay < PRIMARY_NODE_AGE) {
+      var nodeAgeMidpoint = (PRIMARY_NODE_AGE / 2) - 1;
+      ageDecayAdjustment = ((-1.0 / PRIMARY_NODE_AGE) * Math.abs(d.ageDecay - (nodeAgeMidpoint)) + 1) * MAXIMUM_EXTRA_NODE_SIZE;
     } else {
-      ageDecayAdjustment = Math.max((-1) * ((d.ageDecay / nodeAgeMidpoint) - 1), -1);
+      ageDecayAdjustment = Math.max((-1) * ((d.ageDecay + 1 - PRIMARY_NODE_AGE) / NODE_DECAY_LENGTH), -1);
     }
 
     return rScale(d.peopleKilled) * (1 + ageDecayAdjustment);
