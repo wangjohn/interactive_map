@@ -9,6 +9,9 @@ var MAP_HEIGHT = 500;
 var MAXIMUM_NODE_AGE = 10;
 var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
 
+var NORMAL_NODE_COLOR = "#306a76";
+var HIGHLIGHTED_NODE_COLOR = "#DF1B00";
+
 /*
  * Variable initialization
  */
@@ -146,7 +149,7 @@ function createMapNodes(mapInstance, timestampsArray, arrayIndex) {
     .attr("cy", lon)
     .attr("r", radiusFunction)
     .style("opacity", ".35")
-    .style("fill", "#306a76");
+    .style("fill", NORMAL_NODE_COLOR);
 }
 
 function enableNodeHover() {
@@ -190,9 +193,9 @@ function changeNodeColors() {
   d3.selectAll(".kill-event")
     .style("fill", function(d) {
       if ((venueSelected == "all" || d.venue == venueSelected) && (weaponSelected == "all" || d.weaponTypes.indexOf(weaponSelected) > -1)) {
-        return "#DF1B00";
+        return HIGHLIGHTED_NODE_COLOR;
       } else {
-        return "#306a76";
+        return NORMAL_NODE_COLOR;
       }
     });
 }
@@ -243,7 +246,7 @@ d3.json("./data/interactive_map_data.json", function(err, data){
       else { return 0; }
     })
     .style("opacity", ".35")
-    .style("fill", "#306a76");
+    .style("fill", NORMAL_NODE_COLOR);
 
   enableNodeHover();
   changeNodeColors();
