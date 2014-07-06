@@ -13,6 +13,31 @@ var MAXIMUM_EXTRA_NODE_SIZE = 0.1;
 var NORMAL_NODE_COLOR = "#306a76";
 var HIGHLIGHTED_NODE_COLOR = "#DF1B00";
 
+var VENUE_NAME_MAP = {
+  "1": "School (includes university, college, etc.)",
+  "2": "Office",
+  "3": "Manufacturing (includes warehouse, factory, etc.)",
+  "4": "Government building",
+  "5": "Courthouse (includes jail, etc.)",
+  "6": "Hotel (includes motel, etc.)",
+  "7": "Casino",
+  "8": "Industrial (includes oil rig, mine, chemical plant, nuclear plant, etc.)",
+  "9": "Transportation (includes airport, metro, train, cruise, etc.)",
+  "10": "Large venue (includes stadium, raceway, amusement park, etc.)",
+  "11": "Hospital",
+  "12": "Military base"
+};
+
+var WEAPON_NAME_MAP = {
+  "pistol": "Pistol",
+  "rifle": "Rifle",
+  "shotgun": "Shotgun",
+  "unknownGun": "Unknown Gun",
+  "explosive": "Explosive",
+  "knife": "Knife",
+  "nonMetallicObject": "Non-Metallic Object"
+};
+
 /*
  * Variable initialization
  */
@@ -267,7 +292,7 @@ d3.json("./data/interactive_map_data.json", function(err, data){
     var currentTime = timestampsArray[i].date;
 
     //pass parsed time to moment to return correct format
-    var time = moment(currentTime).format("dddd, MMMM Do, h:mm [<span>]a[</span>]");
+    var time = moment(currentTime).format("MMMM Do, YYYY");
 
     //updates current time
     d3.select("#current_time")
@@ -314,9 +339,15 @@ d3.json("./data/interactive_map_data.json", function(err, data){
           .style("left", (d3.event.pageX) + 20 + "px")
           .style("top", (d3.event.pageY) - 30 + "px");
         d3.select('#venue-name')
-          .text(d.venue);
+          .text(VENUE_NAME_MAP[d.venue]);
+
+        var weaponNames = [];
+        for (var i=0; i<d.weaponTypes.length; i++) {
+          weaponNames.push(WEAPON_NAME_MAP[d.weaponTypes[i]]);
+        }
+
         d3.select('#weapon-names')
-          .text(d.weaponTypes);
+          .text(weaponNames.join(", "));
       })
       .on("mouseout", function() {
         //Hide the tooltip
