@@ -218,11 +218,6 @@ function changeNodeColors() {
     });
 }
 
-function setValue(theValue) {
-  $('#slider').slider('value', theValue);
-  $('#showValue').html(theValue);
-}
-
 /*
  * D3 Rendering
  */
@@ -275,7 +270,17 @@ d3.json("./data/interactive_map_data.json", function(err, data){
     min: 0,
     max: maximumSlide,
     step: 1,
-    slide: function( event, ui ){
+    start: function(ev, ui) {
+      if (playInterval !== undefined) {
+        toggleNodeProgression();
+      }
+    },
+    stop: function(ev, ui) {
+      if (playInterval === undefined) {
+        toggleNodeProgression();
+      }
+    },
+    slide: function(ev, ui){
       setSlide(ui.value);
     }
   });
