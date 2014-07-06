@@ -48,6 +48,7 @@ var weaponSelected = "all";
 var playInterval;
 var maximumSlide;
 var autoRewind = true;
+var previousPlayInterval;
 
 var svg = d3.select("#graphic")
             .append("svg")
@@ -272,13 +273,15 @@ d3.json("./data/interactive_map_data.json", function(err, data){
     step: 1,
     start: function(ev, ui) {
       if (playInterval !== undefined) {
+        previousPlayInterval = playInterval;
         toggleNodeProgression();
       }
     },
     stop: function(ev, ui) {
-      if (playInterval === undefined) {
+      if (playInterval === undefined && previousPlayInterval !== undefined) {
         toggleNodeProgression();
       }
+      previousPlayInterval = undefined;
     },
     slide: function(ev, ui){
       setSlide(ui.value);
